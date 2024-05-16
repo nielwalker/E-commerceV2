@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="reg-design.css">
+</head>
+<body>
+    <h2>Click&Eat</h2>
+<div class="container" id="container">
+	<div class="form-container sign-up-container">
+		<form action="#">
+			<h1>Create Account</h1>
+			<input id="fnameInp"  type="text" placeholder="FirstName" />
+            <input id="lnameInp" type="text" placeholder="LastName" />
+			<input id="emailInp" type="email" placeholder="Email" />
+			<input id="passwordInp" type="password" placeholder="Password" />
+            <input id="location" type="text" placeholder="Address" />
+			<button >Sign Up</button>
+		</form>
+	</div>
+	<div class="form-container sign-in-container">
+		<form action="#">
+			<h1>Sign in</h1>
+			<input type="email" placeholder="Email" />
+			<input type="password" placeholder="Password" />
+			<a href="#">Forgot your password?</a>
+			<button type="submit">Sign In</button>
+		</form>
+	</div>
+	<div class="overlay-container">
+		<div class="overlay">
+			<div class="overlay-panel overlay-left">
+				<h1>Welcome Back!</h1>
+				<p>To keep connected with us please login with your personal info</p>
+				<button class="ghost" id="signIn">Sign In</button>
+			</div>
+			<div class="overlay-panel overlay-right">
+				<h1>Hello, Friend!</h1>
+				<p>Enter your personal details and start journey with us</p>
+				<button class="ghost" id="signUp">Sign Up</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<footer>
+	<p>
+		Created with <i class="fa fa-heart"></i> by
+		<a target="_blank" href="https://florin-pop.com">Florin Pop</a>
+		- Read how I created this and how you can join the challenge
+		<a target="_blank" href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/">here</a>.
+	</p>
+</footer>
+<script src="reg.js"></script>
+<script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getDatabase, set , ref } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-analytics.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAu7dBS7aoImMeZF7g9SvpgKPgQSiw4_oQ",
+        authDomain: "e-commerce-91346.firebaseapp.com",
+        projectId: "e-commerce-91346",
+        storageBucket: "e-commerce-91346.appspot.com",
+        messagingSenderId: "602670558958",
+        appId: "1:602670558958:web:7985f3674a81fcaf93cdff",
+        measurementId: "G-6Q1JJ7MDDE"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const auth = getAuth(app);
+    const analytics = getAnalytics(app);
+
+    let EmailInp = document.getElementById('emailInp');
+    let PassInp = document.getElementById('passwordInp');
+    let FnameInp = document.getElementById('fnameInp');
+    let LnameInp = document.getElementById('lnameInp');
+    let MainForm = document.getElementById('MainForm');
+    let Location = document.getElementById('location');
+
+    let RegisterUser = evt =>{
+        evt.preventDefault();
+
+        createUserWithEmailAndPassword(auth, EmailInp.value, PassInp.value)
+        .then((credentials)=>{
+            set(ref(db, 'UsersAuthList/' + credentials.user.uid),{
+                firstname: FnameInp.value,
+                lastname: LnameInp.value
+            })
+        })
+        .catch((error)=>{
+            alert(error.message);
+            console.log(error.code);
+            console.log(error.message);
+
+        })
+    }
+    MainForm.addEventListener('submit', RegisterUser);
+</script>
+</body>
+</html>
