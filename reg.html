@@ -10,23 +10,23 @@
     <h2>Click&Eat</h2>
 <div class="container" id="container">
 	<div class="form-container sign-up-container">
-		<form action="#">
+		<form   id="MainForm2">
 			<h1>Create Account</h1>
-			<input id="fnameInp"  type="text" placeholder="FirstName" />
-            <input id="lnameInp" type="text" placeholder="LastName" />
-			<input id="emailInp" type="email" placeholder="Email" />
-			<input id="passwordInp" type="password" placeholder="Password" />
-            <input id="location" type="text" placeholder="Address" />
-			<button >Sign Up</button>
+            <input id="register-email" type="email" placeholder="Email" />
+			<input id="register-firstname"  type="text" placeholder="FirstName" />
+            <input id="register-lastname" type="text" placeholder="LastName" />
+			<input id="register-password" type="password" placeholder="Password" />
+            <input id="register-location" type="text" placeholder="Address" />
+			<button type="submit" class="btn btn-primary" id="register-btn" >Register</button>
 		</form>
 	</div>
 	<div class="form-container sign-in-container">
-		<form action="#">
+		<form id="MainForm" >
 			<h1>Sign in</h1>
-			<input type="email" placeholder="Email" />
-			<input type="password" placeholder="Password" />
+			<input type="email" placeholder="Email" id="login-email" name="login-email"/>
+			<input type="password" placeholder="Password" id="login-password" name="login-password" />
 			<a href="#">Forgot your password?</a>
-			<button type="submit">Sign In</button>
+			<button type="button" class="btn btn-primary">Sign In</button>
 		</form>
 	</div>
 	<div class="overlay-container">
@@ -39,7 +39,7 @@
 			<div class="overlay-panel overlay-right">
 				<h1>Hello, Friend!</h1>
 				<p>Enter your personal details and start journey with us</p>
-				<button class="ghost" id="signUp">Sign Up</button>
+				<button class="ghost" id="signUp" type="submit">Sign Up</button>
 			</div>
 		</div>
 	</div>
@@ -57,9 +57,8 @@
 <script type="module">
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getDatabase, set , ref } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-
+    import { getDatabase, set , ref ,get , child} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword , signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -78,12 +77,13 @@
     const auth = getAuth(app);
     const analytics = getAnalytics(app);
 
-    let EmailInp = document.getElementById('emailInp');
-    let PassInp = document.getElementById('passwordInp');
-    let FnameInp = document.getElementById('fnameInp');
-    let LnameInp = document.getElementById('lnameInp');
-    let MainForm = document.getElementById('MainForm');
-    let Location = document.getElementById('location');
+    let EmailInp = document.getElementById('register-email');
+    let FnameInp = document.getElementById('register-firstname');
+    let LnameInp = document.getElementById('register-lastname');
+    let PassInp = document.getElementById('register-password');
+    let Location = document.getElementById('register-location');
+    let mainForm2 = document.getElementById('MainForm2');
+    
 
     let RegisterUser = evt =>{
         evt.preventDefault();
@@ -92,7 +92,8 @@
         .then((credentials)=>{
             set(ref(db, 'UsersAuthList/' + credentials.user.uid),{
                 firstname: FnameInp.value,
-                lastname: LnameInp.value
+                lastname: LnameInp.value,
+                location: Location.value
             })
         })
         .catch((error)=>{
@@ -102,7 +103,49 @@
 
         })
     }
-    MainForm.addEventListener('submit', RegisterUser);
+
+    const apps = initializeApp(firebaseConfig);
+    const dbs = getDatabase();
+    const auths = getAuth(apps);
+    const analytic = getAnalytics(apps);
+    const dbref = ref(dbs);
+
+    let EmailInput = document.getElementById('login-email');
+    let PassInput = document.getElementById('login-password');
+    let MainForm = document.getElementById('MainForm');
+    
+
+    let LoginUser = evt =>{
+        evt.preventDefault();
+
+        SignUpWithAccount(auths, EmailInput.value, PassInput.value)
+        .then((credentials)=>{
+            get (child(dbref, 'UsersAuthList/' + credentials.user.uid)).then((snapshot)=>{
+                if(snapshot.exists){
+                    sessionStorage.setItem("user-info", JSON.stringify({
+                        firstname:snapshot.val().firstname,
+                        lastname:snapshot.val().lastname
+                    }))
+                    sessionStorage.setItem("user-creds", JSON.stringify(credentials.user));
+                        window.location.href = 'main.html';
+                }
+                console.log(credentials);
+            })
+            
+        })
+        .catch((error)=>{
+            alert(error.message);
+            console.log(error.code);
+            console.log(error.message);
+
+        })
+    }
+    
+    MainForm.addEventListener('submit',LoginUser);
+
+    mainForm2.addEventListener('submit', RegisterUser);
 </script>
+
+
 </body>
 </html>
