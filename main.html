@@ -88,12 +88,12 @@
         let Signout = ()=>{
             sessionStorage.removeItem("user-creds");
             sessionStorage.removeItem("user-info");
-            window.location.href = 'reg.html';
+            <a href="reg.html"></a>
         }
 
         let CheckCred = ()=>{
             if (sessionStorage.getItem("user-creds"))
-                window.location.href = 'reg.html';
+            <a href="reg.html"></a>
             else {
                 
                 GreetHead.innerText = `${UserInfo.firstname + " " + UserInfo.lastname}`;
